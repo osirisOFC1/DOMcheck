@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+    <style>
+        #logo {
+          position: AUTO;
+          top: 0;
+          left: 0;
+          width: 250px; 
+          height: auto; 
+        }
+        .container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 500px;
+          background-color: #fff8f8;
+        }
+        .image-gallery {
+          display: flex;
+          overflow-x: scroll;
+          background-color: #f2f2f2;
+          padding: 20px;
+        }
+        .product-image {
+          width: 150px; 
+          height: 150px; 
+          object-fit: cover; 
+          margin: 10px; 
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        .zoom-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(170, 160, 160, 0.8);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+        }
+        
+        .zoom-overlay img {
+          max-width: 90%;
+          max-height: 90%;
+        }
+        
+        .like-button {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .like-button::before {
+            content: "\2665";
+            display: block;
+            font-size: 20px;
+            line-height: 30px;
+            color: #9e908d;
+            transition: color 0.3s;
+        }
+        
+        .like-button.liked::before {
+            color: #ff0000;
+        }
+        .total-price-box {
+            margin-top: 50px;
+            text-align: center;
+            font-weight: bolder;
+        }
+        </style>
+
+</head>
+<body>
+    <img id="logo" src="R.png" alt="Logo">
+    <div class="container">
+        <div class="image-gallery">
+            <img class="product-image" src="https://myer-media.com.au/wcsstore/MyerCatalogAssetStore/images/70/700/1327/100/1/786263680/786263680_1_720x928.webp" alt="Product Image 1">
+            <img class="product-image" src="https://myer-media.com.au/wcsstore/MyerCatalogAssetStore/images/70/700/1327/100/1/786263680/786263680_2_720x928.webp" alt="Product Image 2">
+            <img class="product-image" src="https://www.otticasm.com/media/catalog/product/cache/all/small_image/800x533/5b120c3a65892470cb51dd46830aa141/v/e/versace-ve-4361-gb1-87-5.png" alt="Product Image 3">
+            <img class="product-image" src="https://www.versace.com/dw/image/v2/ABAO_PRD/on/demandware.static/-/Sites-ver-master-catalog/default/dwbef67fb3/original/90_O4361-OGB18753_ONUL_24_MedusaBiggieSunglasses-Sunglasses-versace-online-store_6_15.jpg" alt="Product Image 4">
+        </div>
+        
+            <div class="cart-section">
+                <div class="image-gallery">
+                    <button class="like-button"></button><br>
+
+                    <button id="decrementBtn"> - </button>
+                    <span id="cartCount">0</span>
+                    <button id="incrementBtn"> + </button>
+                    <button id="deleteAllBtn">DELETE ALL</button>
+                </div>
+            </div>
+        <div class="total-price-box">
+            Total Price: <span id="totalPrice">$0</span>
+        </div>
+    </div>
+
+    <div class="zoom-overlay" id="zoom-overlay">
+        <img id="zoomed-image" src="" alt="Zoomed Image">
+    </div>
+    
+    <script>
+        var decrementBtn = document.getElementById('decrementBtn');
+        var incrementBtn = document.getElementById('incrementBtn');
+        var deleteAllBtn = document.getElementById('deleteAllBtn');
+        var cartCount = document.getElementById('cartCount');
+        var count = 0;
+        var totalPrice = 0;
+        var totalPriceElement = document.getElementById('totalPrice');
+        
+        decrementBtn.addEventListener('click', function() {
+            if (count > 0) {
+                count--;
+                cartCount.textContent = count;
+                totalPrice -= 19.99; 
+                totalPriceElement.textContent = "$" + totalPrice.toFixed(2);
+            }
+        });
+        
+        incrementBtn.addEventListener('click', function() {
+            count++;
+            cartCount.textContent = count;
+            totalPrice += 19.99; 
+            totalPriceElement.textContent = "$" + totalPrice.toFixed(2);
+        });
+        
+        deleteAllBtn.addEventListener('click', function() {
+            count = 0;
+            cartCount.textContent = count;
+            totalPrice = 0;
+            totalPriceElement.textContent = "$" + totalPrice.toFixed(2);
+        });
+
+        var likeBtn = document.querySelector('.like-button');
+        var isLiked = false;
+        
+        likeBtn.addEventListener('click', function() {
+            isLiked = !isLiked;
+            likeBtn.classList.toggle('liked', isLiked);
+        });
+        var galleryContainer = document.querySelector('.image-gallery');
+        var images = galleryContainer.querySelectorAll('.product-image');
+        for (var i = 0; i < images.length; i++) {
+            images[i].addEventListener('click', function(e) {
+                var imageUrl = e.target.src;
+                showZoomedOverlay(imageUrl);
+            });
+        }
+        function showZoomedOverlay(imageUrl) {
+            var zoomOverlay = document.getElementById('zoom-overlay');
+            var zoomedImage = document.getElementById('zoomed-image');
+            zoomedImage.src = imageUrl;
+            zoomOverlay.style.display = 'flex';
+        }
+        function hideZoomedOverlay() {
+            var zoomOverlay = document.getElementById('zoom-overlay');
+            zoomOverlay.style.display = 'none';
+        }
+        var zoomOverlay = document.getElementById('zoom-overlay');
+        zoomOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideZoomedOverlay();
+            }
+        });
+    </script>
+</body>
+</html>
